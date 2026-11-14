@@ -7,4 +7,20 @@
 
      Unlike the baseline, this file may grow, but every entry is a reviewed decision. -->
 <FindBugsFilter>
+    <!-- D1 (narrowed): EI_EXPOSE_REP and EI_EXPOSE_REP2 off everywhere except ram.document.template.
+         The rule objects to a class handing out, or keeping, a reference to a mutable object someone else holds.
+         Outside the template package, every such reference in Project Pulse is shared on purpose:
+         - JPA entities (144 of the 219): Hibernate tracks changes through the very collection and association
+           objects the entity holds, and the services edit entities through those getters
+           (section.getInstructors(), course.addInstructor(...)). A defensive copy would make those edits vanish.
+         - Spring beans (29): a constructor-injected bean is a singleton meant to be shared.
+         - DTO records and report carriers (44, e.g. UseCaseDto, PeerEvaluationAverage, MyUserPrincipal): built
+           by a converter or service inside one request, serialized, and dropped; nothing keeps them afterwards.
+         The template package is different: DocumentTemplateRegistry loads each template from YAML once and hands the
+         same DocumentTemplate to every request. That is the shared mutable state the rule exists for, so it stays
+         enforced there. -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Not><Package name="team.projectpulse.ram.document.template"/></Not>
+    </Match>
 </FindBugsFilter>
