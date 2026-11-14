@@ -75,7 +75,7 @@ public class SectionSecurityService {
         boolean hasInstructorRole = this.userUtils.hasRole("ROLE_instructor");
         if (hasStudentRole) {
             Student student = this.studentRepository.findById(userIdFromJwt).orElse(null);
-            if (student == null) {
+            if (student == null) { // NOPMD - SimplifyBooleanReturns: kept as the same explicit deny-if-missing guard the other five checks in this class use, so the fail-closed branch the class Javadoc promises stays visible; the merged && form is equivalent
                 return false;
             }
             // Check if the student's sectionId matches the sectionId from the request URI
