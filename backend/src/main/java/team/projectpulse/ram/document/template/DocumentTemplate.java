@@ -3,6 +3,7 @@ package team.projectpulse.ram.document.template;
 import team.projectpulse.ram.requirement.SectionType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DocumentTemplate {
@@ -18,12 +19,14 @@ public class DocumentTemplate {
         this.title = title;
     }
 
+    // DocumentTemplateRegistry loads each template once and hands the same instance to every request, so callers get a
+    // read-only view and the YAML loader's list is copied: no request can change the template another team gets.
     public List<SectionTemplate> getSections() {
-        return sections;
+        return Collections.unmodifiableList(sections);
     }
 
     public void setSections(List<SectionTemplate> sections) {
-        this.sections = sections;
+        this.sections = new ArrayList<>(sections);
     }
 
     public static class SectionTemplate {

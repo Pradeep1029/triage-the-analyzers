@@ -54,7 +54,7 @@ public class SectionService {
         }
 
         if (StringUtils.hasLength(searchCriteria.get("isActive"))) {
-            String activeStr = searchCriteria.get("isActive").toLowerCase();
+            String activeStr = searchCriteria.get("isActive").toLowerCase(); // NOPMD - UseLocaleWithCaseConversions: the result is only compared with "true" and "false", and Java's only locale-specific lowercase rules (tr, az, lt) touch I, J and Į variants, none of which is in either word, so every locale accepts and rejects the same inputs
             if ("true".equals(activeStr) || "false".equals(activeStr)) {
                 Boolean isActive = Boolean.valueOf(activeStr);
                 spec = spec.and(SectionSpecs.hasActiveStatus(isActive));

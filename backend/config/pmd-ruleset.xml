@@ -13,5 +13,25 @@
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
     <description>PMD quickstart, with Project Pulse's decisions.</description>
     <rule ref="rulesets/java/quickstart.xml">
+        <!-- D2 (narrowed, re-added below). UnnecessaryConstructor fires on an empty public constructor that is the
+             class's only one. On a JPA entity that constructor is the no-arg constructor the JPA spec requires, and
+             writing it out is deliberate: delete it, and the next person who adds a field constructor silently removes
+             the no-arg one, which compiles and then fails only when Hibernate tries to load a row. Enforced on every
+             other class. UncommentedEmptyConstructor stays enforced everywhere, so each kept empty constructor says
+             why it exists. -->
+        <exclude name="UnnecessaryConstructor"/>
+        <!-- D4 (off). GuardLogStatement asks for an isXxxEnabled() guard around log calls whose arguments do work.
+             Every log call in Project Pulse goes through SLF4J with {} placeholders (no string concatenation), so the
+             message is only formatted when the level is enabled; what still runs unguarded is a getter such as
+             student.getEmail() or templates.size(). The calls it flagged are error and info logs on a failure path,
+             a weekly job, and startup, plus one debug log of authentication.getName() per login. A guard would add
+             an if to each call to save a field read. -->
+        <exclude name="GuardLogStatement"/>
+    </rule>
+    <rule ref="category/java/codestyle.xml/UnnecessaryConstructor">
+        <properties>
+            <property name="violationSuppressXPath"
+                      value="./ancestor-or-self::ClassDeclaration[pmd-java:hasAnnotation('jakarta.persistence.Entity')]"/>
+        </properties>
     </rule>
 </ruleset>
